@@ -355,10 +355,10 @@ const OrderDetail: React.FC = () => {
                                 <span className="font-medium text-gray-700">{accessory.name}</span>
                               </div>
                               <span className="font-medium">
-                                {accessory.price === 0 ? (
+                                {parseFloat(accessory.price || '0') === 0 ? (
                                   <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">Free</span>
                                 ) : (
-                                  <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm">+${accessory.price}</span>
+                                  <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm">+${parseFloat(accessory.price || '0').toFixed(2)}</span>
                                 )}
                               </span>
                             </div>
@@ -369,7 +369,7 @@ const OrderDetail: React.FC = () => {
                             </div>
                             <div className="text-sm text-purple-700 mt-1">
                               • {item.accessories.length} accessory/accessories chosen
-                              • Total accessories value: +${(item.accessories.reduce((sum: number, acc: any) => sum + acc.price, 0) * item.quantity).toFixed(2)}
+                              • Total accessories value: +${(item.accessories.reduce((sum: number, acc: any) => sum + parseFloat(acc.price || '0'), 0) * item.quantity).toFixed(2)}
                             </div>
                           </div>
                         </div>
@@ -377,11 +377,11 @@ const OrderDetail: React.FC = () => {
                     )}
                   </div>
                   <div className="text-right">
-                    <p className="font-medium text-lg">${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</p>
-                    <p className="text-sm text-gray-600">${item.price || 0} each</p>
-                    {item.accessories && item.accessories.some((acc: any) => acc.price > 0) && (
+                    <p className="font-medium text-lg">${(parseFloat(item.price || '0') * (item.quantity || 1)).toFixed(2)}</p>
+                    <p className="text-sm text-gray-600">${parseFloat(item.price || '0').toFixed(2)} each</p>
+                    {item.accessories && item.accessories.some((acc: any) => parseFloat(acc.price || '0') > 0) && (
                       <p className="text-xs text-gray-500">
-                        +${(item.accessories.reduce((sum: number, acc: any) => sum + acc.price, 0) * item.quantity).toFixed(2)} accessories
+                        +${(item.accessories.reduce((sum: number, acc: any) => sum + parseFloat(acc.price || '0'), 0) * item.quantity).toFixed(2)} accessories
                       </p>
                     )}
                   </div>
@@ -399,18 +399,18 @@ const OrderDetail: React.FC = () => {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span>Subtotal:</span>
-                <span>${((order.totalAmount || 0) - (order.shippingCost || 0)).toFixed(2)}</span>
+                <span>${(parseFloat(order.totalAmount || '0') - parseFloat(order.shippingCost || '0')).toFixed(2)}</span>
               </div>
-              {order.shippingCost > 0 && (
+              {parseFloat(order.shippingCost || '0') > 0 && (
                 <div className="flex justify-between">
                   <span>Shipping:</span>
-                  <span>${(order.shippingCost || 0).toFixed(2)}</span>
+                  <span>${parseFloat(order.shippingCost || '0').toFixed(2)}</span>
                 </div>
               )}
               <div className="border-t pt-2">
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total:</span>
-                  <span>${(order.totalAmount || 0).toFixed(2)}</span>
+                  <span>${parseFloat(order.totalAmount || '0').toFixed(2)}</span>
                 </div>
               </div>
             </div>
