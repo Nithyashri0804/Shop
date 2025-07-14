@@ -130,7 +130,7 @@ const OrderDetail: React.FC = () => {
     );
   }
 
-  const statusInfo = getStatusInfo(order.orderStatus);
+  const statusInfo = getStatusInfo(order.status);
   const StatusIcon = statusInfo.icon;
 
   return (
@@ -146,7 +146,7 @@ const OrderDetail: React.FC = () => {
           </Link>
           <div>
             <h1 className="text-3xl font-bold text-gray-800">
-              Order #{order._id.slice(-8).toUpperCase()}
+              Order #{order.id.toString().padStart(8, '0')}
             </h1>
             <p className="text-gray-600">
               Placed on {new Date(order.createdAt).toLocaleDateString()}
@@ -162,7 +162,7 @@ const OrderDetail: React.FC = () => {
               <div>
                 <h2 className="text-xl font-bold text-gray-800">Order Status</h2>
                 <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${statusInfo.bg} ${statusInfo.text}`}>
-                  {order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1)}
+                  {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                 </span>
               </div>
             </div>
@@ -180,11 +180,11 @@ const OrderDetail: React.FC = () => {
             <h4 className="font-medium text-gray-800 mb-4">Order Progress</h4>
             <div className="flex items-center justify-between">
               <div className={`flex flex-col items-center ${
-                ['pending', 'processing', 'shipped', 'delivered'].includes(order.orderStatus) 
+                ['pending', 'processing', 'shipped', 'delivered'].includes(order.status) 
                   ? 'text-green-600' : 'text-gray-400'
               }`}>
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  ['pending', 'processing', 'shipped', 'delivered'].includes(order.orderStatus)
+                  ['pending', 'processing', 'shipped', 'delivered'].includes(order.status)
                     ? 'bg-green-100' : 'bg-gray-100'
                 }`}>
                   <CheckCircle size={20} />
@@ -196,62 +196,62 @@ const OrderDetail: React.FC = () => {
               </div>
               
               <div className={`flex-1 h-1 mx-4 ${
-                ['processing', 'shipped', 'delivered'].includes(order.orderStatus)
+                ['processing', 'shipped', 'delivered'].includes(order.status)
                   ? 'bg-green-200' : 'bg-gray-200'
               }`}></div>
               
               <div className={`flex flex-col items-center ${
-                ['processing', 'shipped', 'delivered'].includes(order.orderStatus)
+                ['processing', 'shipped', 'delivered'].includes(order.status)
                   ? 'text-green-600' : 'text-gray-400'
               }`}>
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  ['processing', 'shipped', 'delivered'].includes(order.orderStatus)
+                  ['processing', 'shipped', 'delivered'].includes(order.status)
                     ? 'bg-green-100' : 'bg-gray-100'
                 }`}>
                   <Package size={20} />
                 </div>
                 <span className="text-xs mt-2 font-medium">Processing</span>
                 <span className="text-xs text-gray-500">
-                  {['processing', 'shipped', 'delivered'].includes(order.orderStatus) ? 'Confirmed' : 'Pending'}
+                  {['processing', 'shipped', 'delivered'].includes(order.status) ? 'Confirmed' : 'Pending'}
                 </span>
               </div>
               
               <div className={`flex-1 h-1 mx-4 ${
-                ['shipped', 'delivered'].includes(order.orderStatus)
+                ['shipped', 'delivered'].includes(order.status)
                   ? 'bg-green-200' : 'bg-gray-200'
               }`}></div>
               
               <div className={`flex flex-col items-center ${
-                ['shipped', 'delivered'].includes(order.orderStatus)
+                ['shipped', 'delivered'].includes(order.status)
                   ? 'text-green-600' : 'text-gray-400'
               }`}>
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  ['shipped', 'delivered'].includes(order.orderStatus)
+                  ['shipped', 'delivered'].includes(order.status)
                     ? 'bg-green-100' : 'bg-gray-100'
                 }`}>
                   <Truck size={20} />
                 </div>
                 <span className="text-xs mt-2 font-medium">Shipped</span>
                 <span className="text-xs text-gray-500">
-                  {['shipped', 'delivered'].includes(order.orderStatus) ? 'In Transit' : 'Pending'}
+                  {['shipped', 'delivered'].includes(order.status) ? 'In Transit' : 'Pending'}
                 </span>
               </div>
               
               <div className={`flex-1 h-1 mx-4 ${
-                order.orderStatus === 'delivered' ? 'bg-green-200' : 'bg-gray-200'
+                order.status === 'delivered' ? 'bg-green-200' : 'bg-gray-200'
               }`}></div>
               
               <div className={`flex flex-col items-center ${
-                order.orderStatus === 'delivered' ? 'text-green-600' : 'text-gray-400'
+                order.status === 'delivered' ? 'text-green-600' : 'text-gray-400'
               }`}>
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  order.orderStatus === 'delivered' ? 'bg-green-100' : 'bg-gray-100'
+                  order.status === 'delivered' ? 'bg-green-100' : 'bg-gray-100'
                 }`}>
                   <CheckCircle size={20} />
                 </div>
                 <span className="text-xs mt-2 font-medium">Delivered</span>
                 <span className="text-xs text-gray-500">
-                  {order.orderStatus === 'delivered' ? 'Completed' : 'Pending'}
+                  {order.status === 'delivered' ? 'Completed' : 'Pending'}
                 </span>
               </div>
             </div>
