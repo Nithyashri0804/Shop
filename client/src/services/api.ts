@@ -125,6 +125,18 @@ export const uploadAPI = {
   },
 };
 
+// Cart API
+export const cartAPI = {
+  getCart: () => api.get('/cart'),
+  addToCart: (data: { productId: number; size: string; quantity: number; accessories?: any[] }) => 
+    api.post('/cart', data),
+  updateCartItem: (productId: number, size: string, data: { quantity: number }) => 
+    api.put(`/cart/${productId}/${size}`, data),
+  removeFromCart: (productId: number, size: string) => 
+    api.delete(`/cart/${productId}/${size}`),
+  clearCart: () => api.delete('/cart'),
+};
+
 // Wishlist API
 export const wishlistAPI = {
   getWishlist: () => api.get('/wishlist'),

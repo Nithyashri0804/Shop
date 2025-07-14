@@ -10,6 +10,7 @@ import {
   wishlist, 
   paymentSettings, 
   reviews,
+  cart,
   type User,
   type Product,
   type Category,
@@ -652,6 +653,186 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error('Payment status update error:', error);
       res.status(500).json({ message: 'Failed to update payment status' });
+    }
+  });
+
+  // Cart routes (authenticated users only)
+  app.get('/api/cart', authenticateToken, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      
+      const cartItems = await db
+        .select({
+          id: cart.id,
+          productId: cart.productId,
+          size: cart.size,
+          quantity: cart.quantity,
+          accessories: cart.accessories,
+          product: {
+            id: products.id,
+            name: products.name,
+            price: products.price,
+            images: products.images,
+            media: products.media,
+            sizes: products.sizes,
+            colors: products.colors,
+            stock: products.stock,
+            category: products.category,
+            gender: products.gender,
+            isActive: products.isActive,
+          }
+        })
+        .from(cart)
+        .innerJoin(products, eq(cart.productId, products.id))
+        .where(eq(cart.userId, userId));
+
+      // Format cart items to match frontend expectations
+      const formattedItems = cartItems.map(item => ({
+        productId: item.productId,
+        product: item.product,
+        size: item.size,
+        quantity: item.quantity,
+        accessories: item.accessories || []
+      }));
+
+      res.json(formattedItems);
+    } catch (error) {
+      console.error('Error fetching cart:', error);
+      res.status(500).json({ message: 'Failed to fetch cart' });
+    }
+  });
+
+  app.post('/api/cart', authenticateToken, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { productId, size, quantity, accessories = [] } = req.body;
+
+      // Validate required fields
+      if (!productId || !size || !quantity) {
+        return res.status(400).json({ message: 'Product ID, size, and quantity are required' });
+      }
+
+      // Check if item already exists in cart
+      const existingItem = await db
+        .select()
+        .from(cart)
+        .where(
+          and(
+            eq(cart.userId, userId),
+            eq(cart.productId, productId),
+            eq(cart.size, size)
+          )
+        )
+        .limit(1);
+
+      if (existingItem.length > 0) {
+        // Update existing item quantity
+        const [updatedItem] = await db
+          .update(cart)
+          .set({ 
+            quantity: existingItem[0].quantity + quantity,
+            updatedAt: new Date()
+          })
+          .where(eq(cart.id, existingItem[0].id))
+          .returning();
+        
+        res.json(updatedItem);
+      } else {
+        // Create new cart item
+        const [newItem] = await db
+          .insert(cart)
+          .values({
+            userId,
+            productId,
+            size,
+            quantity,
+            accessories
+          })
+          .returning();
+        
+        res.status(201).json(newItem);
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      res.status(500).json({ message: 'Failed to add item to cart' });
+    }
+  });
+
+  app.put('/api/cart/:productId/:size', authenticateToken, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { productId, size } = req.params;
+      const { quantity } = req.body;
+
+      if (quantity <= 0) {
+        return res.status(400).json({ message: 'Quantity must be greater than 0' });
+      }
+
+      const [updatedItem] = await db
+        .update(cart)
+        .set({ 
+          quantity,
+          updatedAt: new Date()
+        })
+        .where(
+          and(
+            eq(cart.userId, userId),
+            eq(cart.productId, parseInt(productId)),
+            eq(cart.size, size)
+          )
+        )
+        .returning();
+
+      if (!updatedItem) {
+        return res.status(404).json({ message: 'Cart item not found' });
+      }
+
+      res.json(updatedItem);
+    } catch (error) {
+      console.error('Error updating cart item:', error);
+      res.status(500).json({ message: 'Failed to update cart item' });
+    }
+  });
+
+  app.delete('/api/cart/:productId/:size', authenticateToken, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { productId, size } = req.params;
+
+      const [deletedItem] = await db
+        .delete(cart)
+        .where(
+          and(
+            eq(cart.userId, userId),
+            eq(cart.productId, parseInt(productId)),
+            eq(cart.size, size)
+          )
+        )
+        .returning();
+
+      if (!deletedItem) {
+        return res.status(404).json({ message: 'Cart item not found' });
+      }
+
+      res.json({ message: 'Item removed from cart' });
+    } catch (error) {
+      console.error('Error removing cart item:', error);
+      res.status(500).json({ message: 'Failed to remove cart item' });
+    }
+  });
+
+  app.delete('/api/cart', authenticateToken, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+
+      await db
+        .delete(cart)
+        .where(eq(cart.userId, userId));
+
+      res.json({ message: 'Cart cleared' });
+    } catch (error) {
+      console.error('Error clearing cart:', error);
+      res.status(500).json({ message: 'Failed to clear cart' });
     }
   });
 

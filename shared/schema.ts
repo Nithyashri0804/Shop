@@ -73,6 +73,18 @@ export const wishlist = pgTable("wishlist", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Cart table
+export const cart = pgTable("cart", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  productId: integer("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  size: text("size").notNull(),
+  quantity: integer("quantity").notNull(),
+  accessories: json("accessories").default([]),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 // Payment settings table
 export const paymentSettings = pgTable("payment_settings", {
   id: serial("id").primaryKey(),
@@ -101,6 +113,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   orders: many(orders),
   wishlist: many(wishlist),
   reviews: many(reviews),
+  cart: many(cart),
 }));
 
 export const ordersRelations = relations(orders, ({ one }) => ({
@@ -120,6 +133,12 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
 export const productsRelations = relations(products, ({ many }) => ({
   wishlist: many(wishlist),
   reviews: many(reviews),
+  cart: many(cart),
+}));
+
+export const cartRelations = relations(cart, ({ one }) => ({
+  user: one(users, { fields: [cart.userId], references: [users.id] }),
+  product: one(products, { fields: [cart.productId], references: [products.id] }),
 }));
 
 // Insert schemas
@@ -187,6 +206,14 @@ export const insertWishlistSchema = createInsertSchema(wishlist).pick({
   productId: true,
 });
 
+export const insertCartSchema = createInsertSchema(cart).pick({
+  userId: true,
+  productId: true,
+  size: true,
+  quantity: true,
+  accessories: true,
+});
+
 export const insertPaymentSettingsSchema = createInsertSchema(paymentSettings).pick({
   codEnabled: true,
   qrEnabled: true,
@@ -225,3 +252,6 @@ export type PaymentSettings = typeof paymentSettings.$inferSelect;
 
 export type InsertReview = z.infer<typeof insertReviewSchema>;
 export type Review = typeof reviews.$inferSelect;
+
+export type InsertCart = z.infer<typeof insertCartSchema>;
+export type Cart = typeof cart.$inferSelect;
