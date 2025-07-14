@@ -596,16 +596,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/orders', authenticateToken, async (req: any, res) => {
     try {
-      const orderData = insertOrderSchema.parse({
-        ...req.body,
-        userId: req.user.id
-      });
+      console.log('Creating order with data:', req.body);
+      
+      // Validate and enrich order items with product details
+      const enrichedItems = await Promise.all(
+        req.body.items.map(async (item: any) => {
+          const [productData] = await db.select().from(products).where(eq(products.id, item.productId));
+          
+          if (!productData) {
+            throw new Error(`Product with ID ${item.productId} not found`);
+          }
+          
+          return {
+            productId: item.productId,
+            product: productData, // Include full product data
+            size: item.size,
+            quantity: item.quantity,
+            price: productData.price,
+            accessories: item.accessories || []
+          };
+        })
+      );
+      
+      const orderData = {
+        userId: req.user.id,
+        items: enrichedItems,
+        totalAmount: req.body.totalAmount || req.body.total,
+        status: req.body.status || 'pending',
+        paymentMethod: req.body.paymentMethod,
+        paymentStatus: req.body.paymentStatus || 'pending',
+        shippingAddress: req.body.shippingAddress,
+        trackingNumber: req.body.trackingNumber || null
+      };
+      
+      console.log('Processed order data:', orderData);
       
       const [order] = await db.insert(orders).values(orderData).returning();
+      console.log('Order created successfully:', order);
+      
       res.status(201).json(order);
     } catch (error: any) {
       console.error('Order creation error:', error);
-      res.status(500).json({ message: 'Failed to create order' });
+      res.status(500).json({ message: error.message || 'Failed to create order' });
     }
   });
 
