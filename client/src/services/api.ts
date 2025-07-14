@@ -66,12 +66,12 @@ export const ordersAPI = {
   
   getMyOrders: () => api.get('/orders/my-orders'),
   
-  getAllOrders: (params?: any) => api.get('/orders', { params }),
+  getAllOrders: (params?: any) => api.get('/orders/all', { params }),
   
   getOrder: (id: string) => api.get(`/orders/${id}`),
   
-  updateOrderStatus: (id: string, orderStatus: string, trackingNumber?: string) =>
-    api.put(`/orders/${id}/status`, { orderStatus, trackingNumber }),
+  updateOrderStatus: (id: string, status: string, trackingNumber?: string) =>
+    api.put(`/orders/${id}/status`, { status, trackingNumber }),
   
   updateOrderPaymentStatus: (id: string, paymentStatus: string) =>
     api.put(`/orders/${id}/payment-status`, { paymentStatus }),

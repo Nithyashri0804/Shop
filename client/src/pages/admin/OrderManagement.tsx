@@ -99,7 +99,7 @@ const OrderManagement: React.FC = () => {
     if (!selectedOrder || !newStatus) return;
     
     try {
-      await ordersAPI.updateOrderStatus(selectedOrder._id, newStatus, trackingNumber);
+      await ordersAPI.updateOrderStatus(selectedOrder.id, newStatus, trackingNumber);
       setShowStatusModal(false);
       setShowOrderModal(false);
       setNewStatus('');
@@ -115,7 +115,7 @@ const OrderManagement: React.FC = () => {
     
     try {
       // Update payment status via API
-      await ordersAPI.updateOrderPaymentStatus(selectedOrder._id, newPaymentStatus);
+      await ordersAPI.updateOrderPaymentStatus(selectedOrder.id, newPaymentStatus);
       setShowPaymentModal(false);
       setShowOrderModal(false);
       setNewPaymentStatus('');
@@ -130,10 +130,10 @@ const OrderManagement: React.FC = () => {
     return orderStatuses.find(s => s.value === status) || orderStatuses[0];
   };
 
-  const filteredOrders = orders.filter(order =>
-    order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    order.user?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    order.user?.email.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredOrders = (orders || []).filter(order =>
+    order.id.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+    order.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    order.user?.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -147,7 +147,7 @@ const OrderManagement: React.FC = () => {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
           {orderStatuses.map((status) => {
-            const count = orders.filter(order => order.orderStatus === status.value).length;
+            const count = (orders || []).filter(order => order.status === status.value).length;
             const Icon = status.icon;
             
             return (
