@@ -355,12 +355,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/products', authenticateAdmin, async (req: any, res) => {
     try {
-      const productData = insertProductSchema.parse(req.body);
+      console.log('Creating product with data:', JSON.stringify(req.body, null, 2));
+      
+      // Validate required fields
+      const { name, description, price, category, gender, sizes, colors } = req.body;
+      
+      if (!name || !name.trim()) {
+        return res.status(400).json({ message: 'Product name is required' });
+      }
+      
+      if (!description || !description.trim()) {
+        return res.status(400).json({ message: 'Product description is required' });
+      }
+      
+      if (!price || parseFloat(price) <= 0) {
+        return res.status(400).json({ message: 'Valid price is required' });
+      }
+      
+      if (!category || !category.trim()) {
+        return res.status(400).json({ message: 'Category is required' });
+      }
+      
+      if (!gender) {
+        return res.status(400).json({ message: 'Gender is required' });
+      }
+      
+      if (!sizes || !Array.isArray(sizes) || sizes.length === 0) {
+        return res.status(400).json({ message: 'At least one size must be selected' });
+      }
+      
+      if (!colors || !Array.isArray(colors) || colors.length === 0) {
+        return res.status(400).json({ message: 'At least one color must be selected' });
+      }
+      
+      // Prepare product data with proper defaults
+      const productData = {
+        name: name.trim(),
+        description: description.trim(),
+        price: parseFloat(price),
+        originalPrice: req.body.originalPrice ? parseFloat(req.body.originalPrice) : null,
+        category: category.trim(),
+        gender,
+        sizes: Array.isArray(sizes) ? sizes : [],
+        colors: Array.isArray(colors) ? colors : [],
+        stock: req.body.stock || {},
+        media: Array.isArray(req.body.media) ? req.body.media : [],
+        images: Array.isArray(req.body.images) ? req.body.images : (Array.isArray(req.body.media) ? req.body.media : []),
+        accessories: Array.isArray(req.body.accessories) ? req.body.accessories : [],
+        tags: Array.isArray(req.body.tags) ? req.body.tags : (typeof req.body.tags === 'string' ? req.body.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : []),
+        weight: req.body.weight ? parseFloat(req.body.weight) : null,
+        shippingCost: req.body.shippingCost ? parseFloat(req.body.shippingCost) : null,
+        featured: Boolean(req.body.featured),
+        isActive: req.body.isActive !== false
+      };
+      
+      console.log('Processed product data:', JSON.stringify(productData, null, 2));
+      
       const [product] = await db.insert(products).values(productData).returning();
+      console.log('Product created successfully:', product.id);
       res.status(201).json(product);
     } catch (error: any) {
       console.error('Product creation error:', error);
-      res.status(500).json({ message: 'Failed to create product' });
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        code: error.code
+      });
+      
+      // Return more specific error messages
+      if (error.code === '23505') { // Unique constraint violation
+        return res.status(400).json({ message: 'A product with this name already exists' });
+      }
+      
+      if (error.message.includes('invalid input syntax')) {
+        return res.status(400).json({ message: 'Invalid data format provided' });
+      }
+      
+      res.status(500).json({ 
+        message: error.message || 'Failed to create product',
+        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      });
     }
   });
 

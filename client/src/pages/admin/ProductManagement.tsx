@@ -188,49 +188,43 @@ const ProductManagement: React.FC = () => {
     
     // Validation
     if (!formData.name.trim()) {
-      alert('Product name is required');
+      showToast('Product name is required', 'error');
       return;
     }
     
     if (!formData.description.trim()) {
-      alert('Product description is required');
+      showToast('Product description is required', 'error');
       return;
     }
     
     if (!formData.price || parseFloat(formData.price) <= 0) {
-      alert('Valid price is required');
+      showToast('Valid price is required', 'error');
       return;
     }
     
     if (!formData.category) {
-      alert('Category is required');
+      showToast('Category is required', 'error');
       return;
     }
     
     if (formData.sizes.length === 0) {
-      alert('At least one size must be selected');
+      showToast('At least one size must be selected', 'error');
       return;
     }
     
     if (formData.colors.length === 0) {
-      alert('At least one color must be selected');
+      showToast('At least one color must be selected', 'error');
       return;
     }
     
-    // Media validation - make it optional for now to avoid blocking product creation
-    // if (formData.media.length === 0) {
-    //   alert('At least one media file must be uploaded');
-    //   return;
-    // }
-
     // Validate accessories
     for (const accessory of formData.accessories) {
       if (!accessory.name.trim()) {
-        alert('All accessories must have a name');
+        showToast('All accessories must have a name', 'error');
         return;
       }
       if (accessory.price < 0) {
-        alert('Accessory prices cannot be negative');
+        showToast('Accessory prices cannot be negative', 'error');
         return;
       }
     }
@@ -238,6 +232,8 @@ const ProductManagement: React.FC = () => {
     setModalLoading(true);
 
     try {
+      console.log('Submitting product data:', formData);
+      
       const productData = {
         name: formData.name.trim(),
         description: formData.description.trim(),
@@ -262,10 +258,14 @@ const ProductManagement: React.FC = () => {
         isActive: formData.isActive
       };
 
+      console.log('Processed product data:', productData);
+
       if (editingProduct) {
         await productsAPI.updateProduct(editingProduct._id, productData);
+        showToast('Product updated successfully!', 'success');
       } else {
         await productsAPI.createProduct(productData);
+        showToast('Product created successfully!', 'success');
       }
 
       setShowModal(false);
@@ -273,7 +273,13 @@ const ProductManagement: React.FC = () => {
       fetchProducts();
     } catch (error: any) {
       console.error('Error saving product:', error);
-      alert(error.response?.data?.message || 'Error saving product');
+      const errorMessage = error.response?.data?.message || error.message || 'Error saving product';
+      showToast(errorMessage, 'error');
+      
+      // Log additional error details for debugging
+      if (error.response?.data?.details) {
+        console.error('Error details:', error.response.data.details);
+      }
     } finally {
       setModalLoading(false);
     }
