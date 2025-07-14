@@ -22,8 +22,7 @@ import Profile from './pages/profile/Profile';
 import Dashboard from './pages/admin/Dashboard';
 import ProductManagement from './pages/admin/ProductManagement';
 import OrderManagement from './pages/admin/OrderManagement';
-import UserManagement from './pages/admin/UserManagement';
-import Analytics from './pages/admin/Analytics';
+
 import Wishlist from './pages/wishlist/Wishlist';
 import About from './pages/About';
 import Contact from './pages/Contact';
@@ -60,8 +59,7 @@ function App() {
                   <Route path="/admin" element={<Dashboard />} />
                   <Route path="/admin/products" element={<ProductManagement />} />
                   <Route path="/admin/orders" element={<OrderManagement />} />
-                  <Route path="/admin/users" element={<UserManagement />} />
-                  <Route path="/admin/analytics" element={<Analytics />} />
+
                   <Route path="/admin/categories" element={<CategoryManagement />} />
                   <Route path="/admin/delivery-zones" element={<DeliveryZoneManagement />} />
                   <Route path="/admin/payment-settings" element={<PaymentSettings />} />

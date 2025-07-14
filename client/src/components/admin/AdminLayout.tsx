@@ -4,8 +4,6 @@ import {
   LayoutDashboard, 
   Package, 
   ShoppingCart, 
-  Users, 
-  BarChart3, 
   Settings, 
   Tag,
   Truck,
@@ -87,8 +85,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     { path: '/admin/delivery-zones', icon: Truck, label: 'Delivery Zones' },
     { path: '/admin/payment-settings', icon: CreditCard, label: 'Payment Settings' },
     { path: '/admin/orders', icon: ShoppingCart, label: 'Orders' },
-    { path: '/admin/users', icon: Users, label: 'Users' },
-    { path: '/admin/analytics', icon: BarChart3, label: 'Analytics' },
   ];
 
   return (
