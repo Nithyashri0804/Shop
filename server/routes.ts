@@ -653,7 +653,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // File upload routes
-  app.post('/api/upload/media', upload.array('files', 10), async (req: any, res) => {
+  app.post('/api/upload/media', authenticateAdmin, upload.array('media', 10), async (req: any, res) => {
     try {
       const files = req.files as Express.Multer.File[];
       
@@ -661,21 +661,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'No files uploaded' });
       }
       
-      const uploadedFiles = files.map(file => {
+      const uploadedMedia = files.map((file, index) => {
         // Convert to base64 for storage
         const base64 = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
-        return {
-          originalName: file.originalname,
-          mimeType: file.mimetype,
-          size: file.size,
-          dataUrl: base64
-        };
+        // Return just the base64 string as the media ID
+        return base64;
       });
       
-      res.json({ files: uploadedFiles });
+      res.json({ media: uploadedMedia });
     } catch (error: any) {
       console.error('File upload error:', error);
       res.status(500).json({ message: 'Failed to upload files' });
+    }
+  });
+
+  // Legacy support for images endpoint
+  app.post('/api/upload/images', authenticateAdmin, upload.array('images', 10), async (req: any, res) => {
+    try {
+      const files = req.files as Express.Multer.File[];
+      
+      if (!files || files.length === 0) {
+        return res.status(400).json({ message: 'No files uploaded' });
+      }
+      
+      const uploadedImages = files.map((file, index) => {
+        // Convert to base64 for storage
+        const base64 = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+        return base64;
+      });
+      
+      res.json({ images: uploadedImages });
+    } catch (error: any) {
+      console.error('Image upload error:', error);
+      res.status(500).json({ message: 'Failed to upload images' });
+    }
+  });
+
+  // Delete media endpoint
+  app.delete('/api/upload/media/:mediaId', authenticateAdmin, async (req: any, res) => {
+    try {
+      // Since we're using base64 storage, we don't need to delete files from disk
+      // Just return success
+      res.json({ message: 'Media deleted successfully' });
+    } catch (error: any) {
+      console.error('Media deletion error:', error);
+      res.status(500).json({ message: 'Failed to delete media' });
     }
   });
 

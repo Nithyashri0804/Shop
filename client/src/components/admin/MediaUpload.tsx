@@ -71,7 +71,7 @@ const MediaUpload: React.FC<MediaUploadProps> = ({
         onMediaChange(newMedia);
         console.log('Media updated:', newMedia);
       } else {
-        throw new Error('Invalid response format');
+        throw new Error('Invalid response format from server');
       }
     } catch (error: any) {
       console.error('Upload error:', error);

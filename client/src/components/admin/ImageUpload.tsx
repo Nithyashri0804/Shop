@@ -59,7 +59,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
     try {
       console.log('Uploading images...', validFiles.length);
-      console.log('FormData entries:', Array.from(formData.entries()).map(([key, value]) => [key, value instanceof File ? value.name : value]));
       const response = await uploadAPI.uploadImages(formData);
       console.log('Upload response:', response.data);
       
@@ -68,7 +67,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         onImagesChange(newImages);
         console.log('Images updated:', newImages);
       } else {
-        throw new Error('Invalid response format');
+        throw new Error('Invalid response format from server');
       }
     } catch (error: any) {
       console.error('Upload error:', error);

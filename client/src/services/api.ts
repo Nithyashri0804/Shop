@@ -115,7 +115,7 @@ export const uploadAPI = {
     timeout: 30000,
   }),
   
-  deleteImage: (imageId: string) => api.delete(`/upload/media/${imageId}`),
+  deleteImage: (imageId: string) => api.delete(`/upload/media/${encodeURIComponent(imageId)}`),
 };
 
 // Wishlist API
