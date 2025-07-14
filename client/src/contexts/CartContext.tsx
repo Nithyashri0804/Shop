@@ -342,7 +342,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = items.reduce((sum, item) => {
-    const productTotal = item.product.price * item.quantity;
+    const productTotal = parseFloat(item.product.price) * item.quantity;
     const accessoriesTotal = (item.accessories || []).reduce((accSum: number, acc: any) => accSum + (acc.price * item.quantity), 0);
     return sum + productTotal + accessoriesTotal;
   }, 0);

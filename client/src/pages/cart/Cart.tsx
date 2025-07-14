@@ -147,11 +147,11 @@ const Cart: React.FC = () => {
                       )}
                       <div className="mt-2">
                         <p className="text-lg font-bold text-purple-600">
-                          ${(item.product.price + (item.accessories || []).reduce((sum: number, acc: any) => sum + acc.price, 0)).toFixed(2)}
+                          ${(parseFloat(item.product.price) + (item.accessories || []).reduce((sum: number, acc: any) => sum + acc.price, 0)).toFixed(2)}
                         </p>
                         {item.accessories && item.accessories.some((acc: any) => acc.price > 0) && (
                           <p className="text-sm text-gray-500">
-                            Base: ${item.product.price} + Accessories: ${(item.accessories || []).reduce((sum: number, acc: any) => sum + acc.price, 0).toFixed(2)}
+                            Base: ${parseFloat(item.product.price).toFixed(2)} + Accessories: ${(item.accessories || []).reduce((sum: number, acc: any) => sum + acc.price, 0).toFixed(2)}
                           </p>
                         )}
                       </div>
