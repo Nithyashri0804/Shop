@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Mobile-first responsive design utilities */
+@layer utilities {
+  /* Touch-friendly interactions */
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Smooth animations */
+  .animate-in {
+    animation-duration: 200ms;
+    animation-fill-mode: both;
+  }
+  
+  .slide-in-from-top-2 {
+    animation-name: slideInFromTop;
+  }
+  
+  .fade-in {
+    animation-name: fadeIn;
+  }
+  
+  @keyframes slideInFromTop {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  /* Responsive text truncation */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* Base responsive styles */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Ensure minimum touch target sizes on mobile */
+  @media (max-width: 768px) {
+    button, 
+    a[role="button"], 
+    input[type="button"], 
+    input[type="submit"], 
+    input[type="reset"] {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+  
+  /* Focus styles for accessibility */
+  *:focus-visible {
+    outline: 2px solid theme('colors.purple.600');
+    outline-offset: 2px;
+  }
+  
+  /* Remove default focus styles for mouse users */
+  *:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+/* Component-specific responsive styles */
+@layer components {
+  /* Responsive container with better mobile padding */
+  .container {
+    @apply mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  /* Responsive grid layouts */
+  .responsive-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6;
+  }
+  
+  .responsive-grid-2 {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6;
+  }
+  
+  /* Mobile-optimized form inputs */
+  .form-input {
+    @apply w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 text-base sm:text-sm;
+  }
+  
+  /* Mobile-optimized buttons */
+  .btn-primary {
+    @apply bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-200 font-medium touch-manipulation;
+  }
+  
+  .btn-secondary {
+    @apply border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors font-medium touch-manipulation;
+  }
+  
+  /* Card components with responsive spacing */
+  .card {
+    @apply bg-white rounded-lg sm:rounded-xl shadow-md p-4 sm:p-6;
+  }
+  
+  /* Responsive spacing utilities */
+  .section-padding {
+    @apply py-8 sm:py-12 lg:py-16;
+  }
+  
+  .content-padding {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+}
