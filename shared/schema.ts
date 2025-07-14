@@ -156,6 +156,19 @@ export const insertProductSchema = createInsertSchema(products).pick({
   shippingCost: true,
   featured: true,
   isActive: true,
+}).extend({
+  // Ensure proper validation for required fields
+  name: z.string().min(1, "Product name is required"),
+  description: z.string().min(1, "Product description is required"),
+  price: z.string().or(z.number()).transform(val => typeof val === 'string' ? parseFloat(val) : val),
+  originalPrice: z.string().or(z.number()).optional().transform(val => val ? (typeof val === 'string' ? parseFloat(val) : val) : undefined),
+  category: z.string().min(1, "Category is required"),
+    gender: z.enum(['men', 'women', 'unisex']),
+  sizes: z.array(z.string()).min(1, "At least one size is required"),
+  colors: z.array(z.string()).min(1, "At least one color is required"),
+  stock: z.record(z.string(), z.number().min(0)),
+  weight: z.string().or(z.number()).optional().transform(val => val ? (typeof val === 'string' ? parseFloat(val) : val) : undefined),
+  shippingCost: z.string().or(z.number()).optional().transform(val => val ? (typeof val === 'string' ? parseFloat(val) : val) : undefined),
 });
 
 export const insertOrderSchema = createInsertSchema(orders).pick({

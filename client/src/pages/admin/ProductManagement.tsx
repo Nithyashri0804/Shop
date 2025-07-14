@@ -219,6 +219,14 @@ const ProductManagement: React.FC = () => {
       return;
     }
     
+    // Validate stock for all selected sizes
+    for (const size of formData.sizes) {
+      if (!(size in formData.stock) || formData.stock[size] < 0) {
+        showToast(`Please set stock quantity for size ${size}`, 'error');
+        return;
+      }
+    }
+    
     // Validate accessories
     for (const accessory of formData.accessories) {
       if (!accessory.name.trim()) {
@@ -255,7 +263,7 @@ const ProductManagement: React.FC = () => {
         })),
         tags: formData.tags ? formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag) : [],
         weight: formData.weight ? parseFloat(formData.weight) : undefined,
-        shippingCost: formData.shippingCost ? parseFloat(formData.shippingCost) : 0,
+        shippingCost: formData.shippingCost ? parseFloat(formData.shippingCost) : undefined,
         featured: formData.featured,
         isActive: formData.isActive
       };
@@ -282,6 +290,9 @@ const ProductManagement: React.FC = () => {
       if (error.response?.data?.details) {
         console.error('Error details:', error.response.data.details);
       }
+      
+      // Log the full error response for debugging
+      console.error('Full error response:', error.response);
     } finally {
       setModalLoading(false);
     }

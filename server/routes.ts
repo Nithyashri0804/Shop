@@ -358,7 +358,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Creating product with data:', JSON.stringify(req.body, null, 2));
       
       // Validate required fields
-      const { name, description, price, category, gender, sizes, colors } = req.body;
+      const { name, description, price, category, gender, sizes, colors, stock } = req.body;
       
       if (!name || !name.trim()) {
         return res.status(400).json({ message: 'Product name is required' });
@@ -388,6 +388,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: 'At least one color must be selected' });
       }
       
+      // Validate stock object
+      if (!stock || typeof stock !== 'object') {
+        return res.status(400).json({ message: 'Stock information is required' });
+      }
+      
+      // Ensure all selected sizes have stock values
+      for (const size of sizes) {
+        if (!(size in stock) || stock[size] < 0) {
+          return res.status(400).json({ message: `Stock quantity required for size ${size}` });
+        }
+      }
+      
       // Prepare product data with proper defaults
       const productData = {
         name: name.trim(),
@@ -398,13 +410,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         gender,
         sizes: Array.isArray(sizes) ? sizes : [],
         colors: Array.isArray(colors) ? colors : [],
-        stock: req.body.stock || {},
+        stock: stock || {},
         media: Array.isArray(req.body.media) ? req.body.media : [],
         images: Array.isArray(req.body.images) ? req.body.images : (Array.isArray(req.body.media) ? req.body.media : []),
         accessories: Array.isArray(req.body.accessories) ? req.body.accessories : [],
         tags: Array.isArray(req.body.tags) ? req.body.tags : (typeof req.body.tags === 'string' ? req.body.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : []),
         weight: req.body.weight ? parseFloat(req.body.weight) : null,
-        shippingCost: req.body.shippingCost ? parseFloat(req.body.shippingCost) : null,
+        shippingCost: req.body.shippingCost ? parseFloat(req.body.shippingCost) : 0,
         featured: Boolean(req.body.featured),
         isActive: req.body.isActive !== false
       };
@@ -419,12 +431,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('Error details:', {
         message: error.message,
         stack: error.stack,
-        code: error.code
+        code: error.code,
+        constraint: error.constraint,
+        detail: error.detail
       });
       
       // Return more specific error messages
       if (error.code === '23505') { // Unique constraint violation
         return res.status(400).json({ message: 'A product with this name already exists' });
+      }
+      
+      if (error.code === '23502') { // Not null violation
+        return res.status(400).json({ message: `Required field missing: ${error.column}` });
+      }
+      
+      if (error.code === '22P02') { // Invalid text representation
+        return res.status(400).json({ message: 'Invalid data format - please check numeric fields' });
       }
       
       if (error.message.includes('invalid input syntax')) {
