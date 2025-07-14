@@ -17,17 +17,51 @@ interface CartProviderProps {
 }
 
 const CART_STORAGE_KEY = 'fashionhub_cart';
+const CART_EXPIRY_KEY = 'fashionhub_cart_expiry';
+const CART_EXPIRY_DAYS = 30; // 1 month
 
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
   const { showToast } = useToast();
 
+  // Check if cart has expired
+  const isCartExpired = () => {
+    const expiryTime = localStorage.getItem(CART_EXPIRY_KEY);
+    if (!expiryTime) return false;
+    
+    const expiryDate = new Date(parseInt(expiryTime));
+    const now = new Date();
+    return now > expiryDate;
+  };
+
+  // Set cart expiry time
+  const setCartExpiry = () => {
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + CART_EXPIRY_DAYS);
+    localStorage.setItem(CART_EXPIRY_KEY, expiryDate.getTime().toString());
+  };
+
+  // Clear expired cart
+  const clearExpiredCart = () => {
+    localStorage.removeItem(CART_STORAGE_KEY);
+    localStorage.removeItem(CART_EXPIRY_KEY);
+    console.log('Cart expired and cleared after 1 month of inactivity');
+  };
+
   // Load cart from localStorage on mount
   useEffect(() => {
     const loadCart = () => {
       try {
         console.log('Loading cart from localStorage...');
+        
+        // Check if cart has expired
+        if (isCartExpired()) {
+          clearExpiredCart();
+          setIsInitialized(true);
+          return;
+        }
+        
         const savedCart = localStorage.getItem(CART_STORAGE_KEY);
         
         if (savedCart) {
@@ -47,9 +81,13 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
             
             setItems(validItems);
             console.log('Valid cart items loaded:', validItems);
+            
+            // Update expiry time on successful load (extends the expiry)
+            setCartExpiry();
           } else {
             console.warn('Invalid cart format in localStorage, clearing...');
             localStorage.removeItem(CART_STORAGE_KEY);
+            localStorage.removeItem(CART_EXPIRY_KEY);
           }
         } else {
           console.log('No cart found in localStorage');
@@ -57,6 +95,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       } catch (error) {
         console.error('Error loading cart from localStorage:', error);
         localStorage.removeItem(CART_STORAGE_KEY);
+        localStorage.removeItem(CART_EXPIRY_KEY);
       } finally {
         setIsInitialized(true);
       }
@@ -72,8 +111,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         console.log('Saving cart to localStorage:', items);
         if (items.length > 0) {
           localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+          setCartExpiry(); // Extend expiry time on cart activity
         } else {
           localStorage.removeItem(CART_STORAGE_KEY);
+          localStorage.removeItem(CART_EXPIRY_KEY);
         }
       } catch (error) {
         console.error('Error saving cart to localStorage:', error);
@@ -203,6 +244,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     setItems([]);
     try {
       localStorage.removeItem(CART_STORAGE_KEY);
+      localStorage.removeItem(CART_EXPIRY_KEY);
     } catch (error) {
       console.error('Error clearing cart from localStorage:', error);
     }
