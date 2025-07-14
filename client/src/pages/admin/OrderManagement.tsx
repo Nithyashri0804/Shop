@@ -236,13 +236,13 @@ const OrderManagement: React.FC = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredOrders.map((order) => {
-                    const statusInfo = getStatusInfo(order.orderStatus);
+                    const statusInfo = getStatusInfo(order.status);
                     
                     return (
-                      <tr key={order._id} className="hover:bg-gray-50">
+                      <tr key={order.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">
-                            #{order._id.slice(-8).toUpperCase()}
+                            #{order.id.toString().padStart(8, '0')}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -255,7 +255,7 @@ const OrderManagement: React.FC = () => {
                           {order.items?.length || 0} items
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          ${order.totalAmount?.toFixed(2)}
+                          ${parseFloat(order.totalAmount || '0').toFixed(2)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusInfo.color}`}>
@@ -292,7 +292,7 @@ const OrderManagement: React.FC = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex space-x-2">
                             <button
-                              onClick={() => handleViewOrder(order._id)}
+                              onClick={() => handleViewOrder(order.id)}
                               className="text-purple-600 hover:text-purple-900 p-1 rounded hover:bg-purple-100 transition-colors"
                             >
                               <Eye size={16} />
@@ -300,7 +300,7 @@ const OrderManagement: React.FC = () => {
                             <button
                               onClick={() => {
                                 setSelectedOrder(order);
-                                setNewStatus(order.orderStatus);
+                                setNewStatus(order.status);
                                 setTrackingNumber(order.trackingNumber || '');
                                 setShowStatusModal(true);
                               }}
