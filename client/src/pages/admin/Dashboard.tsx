@@ -51,13 +51,13 @@ const Dashboard: React.FC = () => {
       const categories = categoriesResponse.data || [];
 
       // Calculate stats
-      const totalRevenue = orders.reduce((sum: number, order: any) => sum + (order.totalAmount || 0), 0);
+      const totalRevenue = orders.reduce((sum: number, order: any) => sum + parseFloat(order.totalAmount || '0'), 0);
       const totalOrders = orders.length;
       const totalProducts = products.length;
       const activeProducts = products.filter((p: any) => p.isActive).length;
 
       // Get unique users from orders
-      const uniqueUsers = new Set(orders.map((order: any) => order.user?._id || order.user)).size;
+      const uniqueUsers = new Set(orders.map((order: any) => order.userId || order.user?.id)).size;
 
       // Calculate growth (mock data for now - in real app, compare with previous period)
       const revenueGrowth = 12.5; // This would be calculated from historical data
@@ -302,24 +302,24 @@ const Dashboard: React.FC = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {recentOrders.map((order) => (
-                    <tr key={order._id} className="hover:bg-gray-50">
+                    <tr key={order.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        #{order._id.slice(-8).toUpperCase()}
+                        #{order.id.toString().padStart(8, '0')}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {order.user?.name || 'Unknown'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        ${(order.totalAmount || 0).toFixed(2)}
+                        ${parseFloat(order.totalAmount || '0').toFixed(2)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          order.orderStatus === 'completed' || order.orderStatus === 'delivered' ? 'bg-green-100 text-green-800' :
-                          order.orderStatus === 'processing' ? 'bg-yellow-100 text-yellow-800' :
-                          order.orderStatus === 'shipped' ? 'bg-blue-100 text-blue-800' :
+                          order.status === 'completed' || order.status === 'delivered' ? 'bg-green-100 text-green-800' :
+                          order.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
+                          order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
                           'bg-gray-100 text-gray-800'
                         }`}>
-                          {order.orderStatus?.charAt(0).toUpperCase() + order.orderStatus?.slice(1) || 'Pending'}
+                          {order.status?.charAt(0).toUpperCase() + order.status?.slice(1) || 'Pending'}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
