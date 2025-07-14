@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { CheckCircle, Package, Truck, MapPin, CreditCard } from 'lucide-react';
-import { ordersAPI } from '../../services/api';
+import { ordersAPI, productsAPI } from '../../services/api';
 import { useCart } from '../../contexts/CartContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 
@@ -12,6 +12,7 @@ const OrderConfirmation: React.FC = () => {
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [enrichedItems, setEnrichedItems] = useState<any[]>([]);
 
   // Get order data from location state (for new orders)
   const stateOrderData = location.state?.orderData;
@@ -56,28 +57,37 @@ const OrderConfirmation: React.FC = () => {
     }
   };
   const getProductImageUrl = (product: any) => {
-    // Check for media array first (new format)
-    if (product.media && product.media.length > 0) {
-      const media = product.media[0];
-      if (typeof media === 'string') {
-        if (media.startsWith('http') || media.startsWith('data:')) {
-          return media;
-        }
-        return `http://localhost:5000/api/upload/media/${media}`;
-      }
-      if (media && typeof media === 'object') {
-        if (media.dataUrl) return media.dataUrl;
-        if (media._id) return `http://localhost:5000/api/upload/media/${media._id}`;
-      }
+    // Safety check for undefined product
+    if (!product) {
+      return 'https://images.pexels.com/photos/1021693/pexels-photo-1021693.jpeg?auto=compress&cs=tinysrgb&w=600';
     }
     
-    // Check for images array (legacy format)
-    if (product.images && product.images.length > 0) {
-      const image = product.images[0];
-      if (image.startsWith('http') || image.startsWith('data:')) {
-        return image;
+    try {
+      // Check for media array first (new format)
+      if (product.media && product.media.length > 0) {
+        const media = product.media[0];
+        if (typeof media === 'string') {
+          if (media.startsWith('http') || media.startsWith('data:')) {
+            return media;
+          }
+          return `http://localhost:5000/api/upload/media/${media}`;
+        }
+        if (media && typeof media === 'object') {
+          if (media.dataUrl) return media.dataUrl;
+          if (media._id) return `http://localhost:5000/api/upload/media/${media._id}`;
+        }
       }
-      return `http://localhost:5000/api/upload/images/${image}`;
+      
+      // Check for images array (legacy format)
+      if (product.images && product.images.length > 0) {
+        const image = product.images[0];
+        if (image.startsWith('http') || image.startsWith('data:')) {
+          return image;
+        }
+        return `http://localhost:5000/api/upload/images/${image}`;
+      }
+    } catch (error) {
+      console.error('Error getting product image URL:', error);
     }
     
     // Fallback to placeholder
@@ -95,7 +105,37 @@ const OrderConfirmation: React.FC = () => {
       console.log('Fetching order:', orderId);
       const response = await ordersAPI.getOrder(orderId);
       console.log('Order fetched successfully:', response.data);
-      setOrder(response.data);
+      
+      const orderData = response.data;
+      setOrder(orderData);
+      
+      // Fetch product details for each item
+      if (orderData.items && orderData.items.length > 0) {
+        const enrichedItemsData = await Promise.all(
+          orderData.items.map(async (item: any) => {
+            try {
+              const productResponse = await productsAPI.getProduct(item.productId);
+              return {
+                ...item,
+                product: productResponse.data
+              };
+            } catch (error) {
+              console.error(`Error fetching product ${item.productId}:`, error);
+              return {
+                ...item,
+                product: {
+                  id: item.productId,
+                  name: `Product #${item.productId}`,
+                  images: [],
+                  media: []
+                }
+              };
+            }
+          })
+        );
+        setEnrichedItems(enrichedItemsData);
+      }
+      
       setError(null);
     } catch (error: any) {
       console.error('Error fetching order:', error);
@@ -233,20 +273,26 @@ const OrderConfirmation: React.FC = () => {
           <div>
             <h3 className="font-semibold text-gray-800 mb-3">Order Items</h3>
             <div className="space-y-4">
-              {order.items && order.items.length > 0 ? (
-                order.items.map((item: any, index: number) => (
+              {(enrichedItems.length > 0 ? enrichedItems : order.items || []).length > 0 ? (
+                (enrichedItems.length > 0 ? enrichedItems : order.items || []).map((item: any, index: number) => (
                   <div key={index} className="flex items-center space-x-4 p-4 border rounded-lg">
-                    <img
-                      src={getProductImageUrl(item.product)}
-                      alt={item.product?.name || 'Product'}
-                      className="w-16 h-16 object-cover rounded-lg"
-                      onError={(e) => {
-                        const target = e.currentTarget as HTMLImageElement;
-                        target.src = 'https://images.pexels.com/photos/1021693/pexels-photo-1021693.jpeg?auto=compress&cs=tinysrgb&w=600';
-                      }}
-                    />
+                    {item.product ? (
+                      <img
+                        src={getProductImageUrl(item.product)}
+                        alt={item.product?.name || 'Product'}
+                        className="w-16 h-16 object-cover rounded-lg"
+                        onError={(e) => {
+                          const target = e.currentTarget as HTMLImageElement;
+                          target.src = 'https://images.pexels.com/photos/1021693/pexels-photo-1021693.jpeg?auto=compress&cs=tinysrgb&w=600';
+                        }}
+                      />
+                    ) : (
+                      <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                        <Package size={24} className="text-gray-400" />
+                      </div>
+                    )}
                     <div className="flex-1">
-                      <h4 className="font-medium">{item.product?.name || 'Unknown Product'}</h4>
+                      <h4 className="font-medium">{item.product?.name || `Product #${item.productId}`}</h4>
                       <p className="text-sm text-gray-600">Size: {item.size}</p>
                       <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
                       {item.accessories && item.accessories.length > 0 && (
