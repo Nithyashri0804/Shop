@@ -63,6 +63,7 @@ const MediaUpload: React.FC<MediaUploadProps> = ({
 
     try {
       console.log('Uploading media...', validFiles.length);
+      console.log('FormData fields:', Array.from(formData.keys()));
       const response = await uploadAPI.uploadMedia(formData);
       console.log('Upload response:', response.data);
       

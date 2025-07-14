@@ -108,7 +108,7 @@ export const uploadAPI = {
   getAllMedia: (params?: any) => api.get('/upload/media', { params }),
   
   // Legacy support for images
-  uploadImages: (formData: FormData) => api.post('/upload/media', formData, {
+  uploadImages: (formData: FormData) => api.post('/upload/images', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },

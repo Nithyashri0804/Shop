@@ -653,15 +653,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // File upload routes
-  app.post('/api/upload/media', authenticateAdmin, upload.array('media', 10), async (req: any, res) => {
+  app.post('/api/upload/media', authenticateAdmin, upload.fields([
+    { name: 'media', maxCount: 10 },
+    { name: 'images', maxCount: 10 }
+  ]), async (req: any, res) => {
     try {
-      const files = req.files as Express.Multer.File[];
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      const allFiles: Express.Multer.File[] = [];
       
-      if (!files || files.length === 0) {
+      // Combine files from both 'media' and 'images' fields
+      if (files.media) allFiles.push(...files.media);
+      if (files.images) allFiles.push(...files.images);
+      
+      if (allFiles.length === 0) {
         return res.status(400).json({ message: 'No files uploaded' });
       }
       
-      const uploadedMedia = files.map((file, index) => {
+      const uploadedMedia = allFiles.map((file, index) => {
         // Convert to base64 for storage
         const base64 = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
         // Return just the base64 string as the media ID
@@ -676,15 +684,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Legacy support for images endpoint
-  app.post('/api/upload/images', authenticateAdmin, upload.array('images', 10), async (req: any, res) => {
+  app.post('/api/upload/images', authenticateAdmin, upload.fields([
+    { name: 'media', maxCount: 10 },
+    { name: 'images', maxCount: 10 }
+  ]), async (req: any, res) => {
     try {
-      const files = req.files as Express.Multer.File[];
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      const allFiles: Express.Multer.File[] = [];
       
-      if (!files || files.length === 0) {
+      // Combine files from both 'media' and 'images' fields
+      if (files.media) allFiles.push(...files.media);
+      if (files.images) allFiles.push(...files.images);
+      
+      if (allFiles.length === 0) {
         return res.status(400).json({ message: 'No files uploaded' });
       }
       
-      const uploadedImages = files.map((file, index) => {
+      const uploadedImages = allFiles.map((file, index) => {
         // Convert to base64 for storage
         const base64 = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
         return base64;
