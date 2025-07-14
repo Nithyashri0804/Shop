@@ -370,7 +370,7 @@ const OrderManagement: React.FC = () => {
               <div className="p-6 border-b">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-bold">
-                    Order #{selectedOrder._id.slice(-8).toUpperCase()}
+                    Order #{selectedOrder.id.toString().padStart(8, '0')}
                   </h2>
                   <button
                     onClick={() => setShowOrderModal(false)}
@@ -397,8 +397,8 @@ const OrderManagement: React.FC = () => {
                     <h3 className="text-lg font-semibold mb-4">Order Details</h3>
                     <div className="space-y-2">
                       <p><span className="font-medium">Status:</span> 
-                        <span className={`ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusInfo(selectedOrder.orderStatus).color}`}>
-                          {getStatusInfo(selectedOrder.orderStatus).label}
+                        <span className={`ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusInfo(selectedOrder.status).color}`}>
+                          {getStatusInfo(selectedOrder.status).label}
                         </span>
                       </p>
                       <p><span className="font-medium">Payment:</span> {selectedOrder.paymentMethod?.toUpperCase()}</p>
@@ -496,7 +496,7 @@ const OrderManagement: React.FC = () => {
                 <div className="flex justify-end space-x-3 pt-4 border-t">
                   <button
                     onClick={() => {
-                      setNewStatus(selectedOrder.orderStatus);
+                      setNewStatus(selectedOrder.status);
                       setTrackingNumber(selectedOrder.trackingNumber || '');
                       setShowStatusModal(true);
                     }}
@@ -586,7 +586,7 @@ const OrderManagement: React.FC = () => {
               <div className="p-6 border-b">
                 <h2 className="text-xl font-bold">Update Payment Status</h2>
                 <p className="text-sm text-gray-600 mt-1">
-                  Order #{selectedOrder._id.slice(-8).toUpperCase()} - {selectedOrder.paymentMethod?.toUpperCase()}
+                  Order #{selectedOrder.id.toString().padStart(8, '0')} - {selectedOrder.paymentMethod?.toUpperCase()}
                 </p>
               </div>
               
