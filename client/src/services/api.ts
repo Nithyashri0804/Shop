@@ -115,7 +115,14 @@ export const uploadAPI = {
     timeout: 30000,
   }),
   
-  deleteImage: (imageId: string) => api.delete(`/upload/media/${encodeURIComponent(imageId)}`),
+  deleteImage: (imageId: string) => {
+    // Handle both base64 and regular image IDs
+    if (imageId.startsWith('data:')) {
+      // For base64 images, we don't need to delete from server
+      return Promise.resolve({ data: { message: 'Base64 image removed' } });
+    }
+    return api.delete(`/upload/media/${encodeURIComponent(imageId)}`);
+  },
 };
 
 // Wishlist API

@@ -676,7 +676,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return base64;
       });
       
-      res.json({ media: uploadedMedia });
+      res.json({ 
+        media: uploadedMedia,
+        images: uploadedMedia // Also return as images for compatibility
+      });
     } catch (error: any) {
       console.error('File upload error:', error);
       res.status(500).json({ message: 'Failed to upload files' });

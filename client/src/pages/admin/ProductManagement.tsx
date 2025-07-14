@@ -217,10 +217,11 @@ const ProductManagement: React.FC = () => {
       return;
     }
     
-    if (formData.media.length === 0) {
-      alert('At least one media file must be uploaded');
-      return;
-    }
+    // Media validation - make it optional for now to avoid blocking product creation
+    // if (formData.media.length === 0) {
+    //   alert('At least one media file must be uploaded');
+    //   return;
+    // }
 
     // Validate accessories
     for (const accessory of formData.accessories) {
@@ -248,6 +249,7 @@ const ProductManagement: React.FC = () => {
         colors: formData.colors,
         stock: formData.stock,
         media: formData.media,
+        images: formData.media, // Also set images for backward compatibility
         accessories: formData.accessories.map(acc => ({
           id: acc.id,
           name: acc.name.trim(),

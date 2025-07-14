@@ -58,17 +58,17 @@ const MediaUpload: React.FC<MediaUploadProps> = ({
 
     // Add valid files to form data
     validFiles.forEach(file => {
-      formData.append('media', file);
+      formData.append('images', file); // Use 'images' field name for compatibility
     });
 
     try {
       console.log('Uploading media...', validFiles.length);
       console.log('FormData fields:', Array.from(formData.keys()));
-      const response = await uploadAPI.uploadMedia(formData);
+      const response = await uploadAPI.uploadImages(formData); // Use uploadImages for compatibility
       console.log('Upload response:', response.data);
       
-      if (response.data && response.data.media) {
-        const newMedia = [...media, ...response.data.media];
+      if (response.data && response.data.images) {
+        const newMedia = [...media, ...response.data.images];
         onMediaChange(newMedia);
         console.log('Media updated:', newMedia);
       } else {
@@ -103,7 +103,7 @@ const MediaUpload: React.FC<MediaUploadProps> = ({
     
     try {
       console.log('Deleting media:', mediaId);
-      await uploadAPI.deleteMedia(mediaId);
+      await uploadAPI.deleteImage(mediaId); // Use deleteImage for compatibility
       const newMedia = media.filter((_, i) => i !== index);
       onMediaChange(newMedia);
       console.log('Media deleted successfully');
