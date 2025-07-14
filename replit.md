@@ -4,6 +4,17 @@
 
 This is a full-stack e-commerce application built with React and Express, featuring a modern fashion retail platform called "AS Shreads". The application uses a monorepo structure with shared types and schemas, implementing a complete online shopping experience with product management, cart functionality, user authentication, and order processing.
 
+## Recent Changes
+
+### Migration to Replit Environment (July 14, 2025)
+- ✓ Successfully migrated from Replit Agent to Replit environment
+- ✓ Installed missing dependencies (cross-env)
+- ✓ Created PostgreSQL database and applied schema
+- ✓ Fixed cart table creation issues
+- ✓ Resolved price calculation type errors (string to number conversion)
+- ✓ Added sample products and categories for testing
+- ✓ Verified all core functionality is working
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
