@@ -31,7 +31,18 @@ const OrderConfirmation: React.FC = () => {
       setLoading(true);
       console.log('Creating order with data:', stateOrderData);
       
-      const response = await ordersAPI.createOrder(stateOrderData);
+      // Prepare order data for backend
+      const orderPayload = {
+        items: stateOrderData.items,
+        totalAmount: stateOrderData.totalAmount,
+        status: 'pending',
+        paymentMethod: stateOrderData.paymentMethod,
+        paymentStatus: 'pending',
+        shippingAddress: stateOrderData.shippingAddress
+      };
+      
+      console.log('Order payload:', orderPayload);
+      const response = await ordersAPI.createOrder(orderPayload);
       console.log('Order created successfully:', response.data);
       
       setOrder(response.data);
@@ -173,7 +184,7 @@ const OrderConfirmation: React.FC = () => {
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-800">Order Details</h2>
             <span className="text-sm text-gray-600">
-              Order #{order._id.slice(-8).toUpperCase()}
+              Order #{order.id.toString().padStart(8, '0')}
             </span>
           </div>
 
@@ -184,7 +195,7 @@ const OrderConfirmation: React.FC = () => {
                 Order Status
               </h3>
               <span className="inline-flex px-3 py-1 text-sm font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                {order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1)}
+                {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
               </span>
             </div>
 
@@ -252,8 +263,8 @@ const OrderConfirmation: React.FC = () => {
                       )}
                     </div>
                     <div className="text-right">
-                      <p className="font-medium">${((item.price || 0) * (item.quantity || 1)).toFixed(2)}</p>
-                      <p className="text-sm text-gray-600">${item.price || 0} each</p>
+                      <p className="font-medium">${(parseFloat(item.price || '0') * (item.quantity || 1)).toFixed(2)}</p>
+                      <p className="text-sm text-gray-600">${item.price || '0'} each</p>
                       {item.accessories && item.accessories.some((acc: any) => acc.price > 0) && (
                         <p className="text-xs text-gray-500">
                           +${((item.accessories || []).reduce((sum: number, acc: any) => sum + acc.price, 0) * item.quantity).toFixed(2)} accessories
@@ -275,7 +286,7 @@ const OrderConfirmation: React.FC = () => {
             <div className="flex justify-between items-center">
               <span className="text-lg font-semibold">Total Amount:</span>
               <span className="text-lg font-bold text-purple-600">
-                ${order.totalAmount?.toFixed(2) || '0.00'}
+                ${parseFloat(order.totalAmount || '0').toFixed(2)}
               </span>
             </div>
             {order.shippingCost > 0 && (

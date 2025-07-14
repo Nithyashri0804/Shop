@@ -182,6 +182,7 @@ const Checkout: React.FC = () => {
         accessories: item.accessories || [],
         price: item.product.price
       })),
+      totalAmount: finalTotal.toString(),
       shippingAddress: {
         fullName: formData.fullName.trim(),
         phone: formData.phone.trim(),

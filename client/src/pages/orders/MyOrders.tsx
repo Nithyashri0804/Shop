@@ -149,12 +149,12 @@ const MyOrders: React.FC = () => {
       ) : (
         <div className="space-y-6">
           {orders.map((order) => (
-            <div key={order._id} className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div key={order.id} className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h3 className="text-lg font-semibold text-gray-800">
-                      Order #{order._id.slice(-8).toUpperCase()}
+                      Order #{order.id.toString().padStart(8, '0')}
                     </h3>
                     <p className="text-sm text-gray-600">
                       Placed on {new Date(order.createdAt).toLocaleDateString()}
@@ -162,13 +162,13 @@ const MyOrders: React.FC = () => {
                   </div>
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-2">
-                      {getStatusIcon(order.orderStatus)}
-                      <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(order.orderStatus)}`}>
-                        {order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1)}
+                      {getStatusIcon(order.status)}
+                      <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(order.status)}`}>
+                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                       </span>
                     </div>
                     <Link
-                      to={`/order/${order._id}`}
+                      to={`/order/${order.id}`}
                       className="text-purple-600 hover:text-purple-700 p-2 rounded-lg hover:bg-purple-50 transition-colors"
                     >
                       <Eye size={20} />
@@ -179,7 +179,7 @@ const MyOrders: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <div>
                     <p className="text-sm text-gray-600">Total Amount</p>
-                    <p className="font-semibold text-lg">${(order.totalAmount || 0).toFixed(2)}</p>
+                    <p className="font-semibold text-lg">${parseFloat(order.totalAmount || '0').toFixed(2)}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Payment Method</p>
