@@ -3,6 +3,7 @@ import { Plus, Edit, Trash2, Search, Filter, Package, Eye, Image, Video } from '
 import AdminLayout from '../../components/admin/AdminLayout';
 import MediaUpload from '../../components/admin/MediaUpload';
 import { productsAPI, categoriesAPI } from '../../services/api';
+import { useToast } from '../../contexts/ToastContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 
 const ProductManagement: React.FC = () => {
@@ -17,6 +18,7 @@ const ProductManagement: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const [modalLoading, setModalLoading] = useState(false);
+  const { showToast } = useToast();
 
   const [formData, setFormData] = useState({
     name: '',
