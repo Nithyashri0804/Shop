@@ -1,5 +1,6 @@
 export interface User {
-  _id: string;
+  id: number;
+  _id?: string; // For backward compatibility
   name: string;
   email: string;
   phone?: string;
@@ -8,21 +9,24 @@ export interface User {
 }
 
 export interface Product {
-  _id: string;
+  id: number;
+  _id?: string; // For backward compatibility
   name: string;
   description: string;
   price: number;
   images: string[];
+  media?: string[];
   category: string;
   gender: 'men' | 'women' | 'unisex';
   sizes: string[];
+  colors?: string[];
   stock: { [size: string]: number };
   isActive: boolean;
   createdAt: string;
 }
 
 export interface CartItem {
-  productId: string;
+  productId: string | number;
   product: Product;
   size: string;
   quantity: number;
@@ -30,8 +34,9 @@ export interface CartItem {
 }
 
 export interface Order {
-  _id: string;
-  userId: string;
+  id: number;
+  _id?: string; // For backward compatibility
+  userId: number;
   user: User;
   items: CartItem[];
   total: number;
@@ -42,7 +47,8 @@ export interface Order {
 }
 
 export interface Category {
-  _id: string;
+  id: number;
+  _id?: string; // For backward compatibility
   name: string;
   gender: 'men' | 'women' | 'unisex';
   description?: string;
@@ -72,8 +78,8 @@ export interface AuthContextType {
 export interface CartContextType {
   items: CartItem[];
   addItem: (product: Product, size: string, quantity: number, accessories?: any[]) => void;
-  removeItem: (productId: string, size: string) => void;
-  updateQuantity: (productId: string, size: string, quantity: number) => void;
+  removeItem: (productId: string | number, size: string) => void;
+  updateQuantity: (productId: string | number, size: string, quantity: number) => void;
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;

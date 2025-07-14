@@ -48,7 +48,7 @@ const Cart: React.FC = () => {
     return 'https://images.pexels.com/photos/1021693/pexels-photo-1021693.jpeg?auto=compress&cs=tinysrgb&w=600';
   };
 
-  const handleQuantityChange = (productId: string, size: string, newQuantity: number, maxStock: number) => {
+  const handleQuantityChange = (productId: string | number, size: string, newQuantity: number, maxStock: number) => {
     if (newQuantity <= 0) {
       if (window.confirm('Remove this item from cart?')) {
         removeItem(productId, size);

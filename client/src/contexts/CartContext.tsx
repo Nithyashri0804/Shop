@@ -132,8 +132,9 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     setItems(prevItems => {
       // Create a unique key for cart items including accessories
       const accessoriesKey = JSON.stringify(accessories?.sort((a, b) => a.id.localeCompare(b.id)) || []);
+      const productIdToMatch = product.id || product._id || 0;
       const existingItemIndex = prevItems.findIndex(item => 
-        item.productId === product._id && 
+        item.productId === productIdToMatch && 
         item.size === size &&
         JSON.stringify((item.accessories || []).sort((a, b) => a.id.localeCompare(b.id))) === accessoriesKey
       );
@@ -155,7 +156,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       }
       
       const newItem: CartItem = { 
-        productId: product._id, 
+        productId: product.id || product._id || 0, 
         product, 
         size, 
         quantity, 
@@ -169,7 +170,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     });
   };
 
-  const removeItem = (productId: string, size: string) => {
+  const removeItem = (productId: string | number, size: string) => {
     console.log('Removing item from cart:', { productId, size });
     setItems(prevItems => {
       const filtered = prevItems.filter(item => !(item.productId === productId && item.size === size));
@@ -178,7 +179,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     });
   };
 
-  const updateQuantity = (productId: string, size: string, quantity: number) => {
+  const updateQuantity = (productId: string | number, size: string, quantity: number) => {
     console.log('Updating quantity:', { productId, size, quantity });
     
     if (quantity <= 0) {
