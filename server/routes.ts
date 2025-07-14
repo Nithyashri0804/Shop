@@ -515,6 +515,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get('/api/orders/my-orders', authenticateToken, async (req: any, res) => {
+    try {
+      const userId = parseInt(req.user.id);
+      console.log('User ID for my-orders:', userId, 'Type:', typeof userId);
+      
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: 'Invalid user ID' });
+      }
+      
+      const result = await db.select().from(orders)
+        .where(eq(orders.userId, userId))
+        .orderBy(desc(orders.createdAt));
+      
+      res.json(result);
+    } catch (error: any) {
+      console.error('My orders fetch error:', error);
+      res.status(500).json({ message: 'Failed to fetch orders' });
+    }
+  });
+
   app.get('/api/orders/all', authenticateAdmin, async (req: any, res) => {
     try {
       const { page = 1, limit = 10, status = '' } = req.query;
