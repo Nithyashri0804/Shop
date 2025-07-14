@@ -13,7 +13,8 @@ export interface Product {
   _id?: string; // For backward compatibility
   name: string;
   description: string;
-  price: number;
+  price: string; // Changed from number to string to match database decimal type
+  originalPrice?: string;
   images: string[];
   media?: string[];
   category: string;
@@ -39,7 +40,7 @@ export interface Order {
   userId: number;
   user: User;
   items: CartItem[];
-  total: number;
+  total: string; // Changed from number to string to match database decimal type
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
   shippingAddress: Address;
   paymentMethod: 'cod' | 'qr';

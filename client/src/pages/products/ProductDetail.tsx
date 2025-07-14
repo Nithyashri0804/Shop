@@ -124,8 +124,8 @@ const ProductDetail: React.FC = () => {
     );
   }
 
-  const discount = product.originalPrice && product.originalPrice > product.price 
-    ? Math.round((1 - product.price / product.originalPrice) * 100) 
+  const discount = product.originalPrice && parseFloat(product.originalPrice) > parseFloat(product.price) 
+    ? Math.round((1 - parseFloat(product.price) / parseFloat(product.originalPrice)) * 100) 
     : 0;
 
   return (
@@ -164,7 +164,7 @@ const ProductDetail: React.FC = () => {
 
             <div className="flex items-center space-x-4 mb-6">
               <span className="text-3xl font-bold text-gray-900">${product.price}</span>
-              {product.originalPrice && product.originalPrice > product.price && (
+              {product.originalPrice && parseFloat(product.originalPrice) > parseFloat(product.price) && (
                 <>
                   <span className="text-xl text-gray-500 line-through">${product.originalPrice}</span>
                   <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">

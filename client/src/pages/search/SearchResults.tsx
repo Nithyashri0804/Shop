@@ -49,9 +49,9 @@ const SearchResults: React.FC = () => {
         />
         
         <div className="absolute top-3 left-3">
-          {product.originalPrice && product.originalPrice > product.price && (
+          {product.originalPrice && parseFloat(product.originalPrice) > parseFloat(product.price) && (
             <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-              {Math.round((1 - product.price / product.originalPrice) * 100)}% OFF
+              {Math.round((1 - parseFloat(product.price) / parseFloat(product.originalPrice)) * 100)}% OFF
             </span>
           )}
         </div>
@@ -68,7 +68,7 @@ const SearchResults: React.FC = () => {
         <div className="flex items-center justify-between mt-4">
           <div className="flex items-center space-x-2">
             <span className="text-xl font-bold text-gray-800">${product.price}</span>
-            {product.originalPrice && product.originalPrice > product.price && (
+            {product.originalPrice && parseFloat(product.originalPrice) > parseFloat(product.price) && (
               <span className="text-sm text-gray-500 line-through">${product.originalPrice}</span>
             )}
           </div>

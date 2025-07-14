@@ -161,13 +161,13 @@ const FeaturedProducts: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <span className="text-lg font-bold text-gray-800">${product.price}</span>
-                      {product.originalPrice && product.originalPrice > product.price && (
+                      {product.originalPrice && parseFloat(product.originalPrice) > parseFloat(product.price) && (
                         <span className="text-sm text-gray-500 line-through">${product.originalPrice}</span>
                       )}
                     </div>
-                    {product.originalPrice && product.originalPrice > product.price && (
+                    {product.originalPrice && parseFloat(product.originalPrice) > parseFloat(product.price) && (
                       <span className="text-sm text-green-600 font-medium">
-                        {Math.round((1 - product.price / product.originalPrice) * 100)}% OFF
+                        {Math.round((1 - parseFloat(product.price) / parseFloat(product.originalPrice)) * 100)}% OFF
                       </span>
                     )}
                   </div>

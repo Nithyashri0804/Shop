@@ -208,9 +208,9 @@ const ProductList: React.FC = () => {
         />
         
         <div className="absolute top-3 left-3">
-          {product.originalPrice && product.originalPrice > product.price && (
+          {product.originalPrice && parseFloat(product.originalPrice) > parseFloat(product.price) && (
             <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-              {Math.round((1 - product.price / product.originalPrice) * 100)}% OFF
+              {Math.round((1 - parseFloat(product.price) / parseFloat(product.originalPrice)) * 100)}% OFF
             </span>
           )}
         </div>
