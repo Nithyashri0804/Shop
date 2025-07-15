@@ -17,11 +17,22 @@ git push origin main
 ```
 
 ### 2. Environment Variables in Vercel:
-Make sure these are set in your Vercel project settings:
+Add these exact values in your Vercel project settings → Environment Variables:
 
+**Required (Essential):**
 - `NODE_ENV` = `production`
-- `DATABASE_URL` = (your Neon PostgreSQL connection string)
-- `JWT_SECRET` = (32+ character random string)
+- `DATABASE_URL` = `postgresql://neondb_owner:passkK@ep-broad-snowflake-a1uwr6kw-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require`
+- `JWT_SECRET` = `your_very_secure_jwt_secret_key_here_at_least_32_characters_long`
+
+**Optional (Business Info):**
+- `SESSION_SECRET` = `your_very_secure_session_secret_key_here_at_least_32_characters_long`
+- `BUSINESS_NAME` = `AS Shreads`
+- `BUSINESS_EMAIL` = `shreadslife@gmail.com`
+- `BUSINESS_PHONE` = `+919876543210`
+- `WHATSAPP_NUMBER` = `+919876543210`
+- `BCRYPT_SALT_ROUNDS` = `12`
+- `PASSWORD_MIN_LENGTH` = `6`
+- `MAX_FILE_SIZE` = `5242880`
 
 ### 3. Deploy:
 The deployment should now work automatically when you push to GitHub.
