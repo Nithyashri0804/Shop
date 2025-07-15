@@ -58,6 +58,9 @@ Preferred communication style: Simple, everyday language.
 - ✓ Created deployment checklist for easy reference
 - ✓ Installed cross-env dependency for production builds
 - ✓ Database schema applied successfully
+- ✓ Fixed build dependency issues by moving build tools to production dependencies
+- ✓ Created Vercel-specific deployment guide for user
+- ✓ User chose Vercel for deployment platform
 
 ## System Architecture
 
