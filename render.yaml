@@ -1,11 +1,9 @@
 services:
   - type: web
-    name: as-shreads-backend
+    name: as-shreads-app
     env: node
-    plan: free
-    buildCommand: npm install && npm install --only=dev && npm run build
+    buildCommand: npm install && npm run build
     startCommand: npm start
-    healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
@@ -13,10 +11,9 @@ services:
         fromDatabase:
           name: as-shreads-db
           property: connectionString
-    autoDeploy: true
+    healthCheckPath: /api/health
 
 databases:
   - name: as-shreads-db
     databaseName: as_shreads
     user: as_shreads_user
-    plan: free

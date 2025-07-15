@@ -19,9 +19,6 @@
       "dest": "/dist/public/$1"
     }
   ],
-  "env": {
-    "NODE_ENV": "production"
-  },
   "functions": {
     "server/index.ts": {
       "maxDuration": 30
