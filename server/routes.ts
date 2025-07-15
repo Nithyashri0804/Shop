@@ -411,8 +411,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const productData = {
         name: name.trim(),
         description: description.trim(),
-        price: parseFloat(price),
-        originalPrice: req.body.originalPrice ? parseFloat(req.body.originalPrice) : null,
+        price: parseFloat(price).toFixed(2),
+        originalPrice: req.body.originalPrice ? parseFloat(req.body.originalPrice).toFixed(2) : null,
         category: category.trim(),
         gender,
         sizes: Array.isArray(sizes) ? sizes : [],
@@ -422,8 +422,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         images: Array.isArray(req.body.images) ? req.body.images : (Array.isArray(req.body.media) ? req.body.media : []),
         accessories: Array.isArray(req.body.accessories) ? req.body.accessories : [],
         tags: Array.isArray(req.body.tags) ? req.body.tags : (typeof req.body.tags === 'string' ? req.body.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : []),
-        weight: req.body.weight ? parseFloat(req.body.weight) : null,
-        shippingCost: req.body.shippingCost ? parseFloat(req.body.shippingCost) : 0,
+        weight: req.body.weight ? parseFloat(req.body.weight).toFixed(2) : null,
+        shippingCost: req.body.shippingCost ? parseFloat(req.body.shippingCost).toFixed(2) : "0.00",
         featured: Boolean(req.body.featured),
         isActive: req.body.isActive !== false
       };
@@ -472,8 +472,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = parseInt(req.params.id);
       const productData = insertProductSchema.parse(req.body);
       
+      // Convert numeric fields to strings for decimal columns
+      const updateData = {
+        ...productData,
+        price: typeof productData.price === 'number' ? productData.price.toFixed(2) : productData.price,
+        originalPrice: productData.originalPrice && typeof productData.originalPrice === 'number' ? productData.originalPrice.toFixed(2) : productData.originalPrice,
+        weight: productData.weight && typeof productData.weight === 'number' ? productData.weight.toFixed(2) : productData.weight,
+        shippingCost: productData.shippingCost && typeof productData.shippingCost === 'number' ? productData.shippingCost.toFixed(2) : productData.shippingCost,
+        updatedAt: new Date()
+      };
+
       const [product] = await db.update(products)
-        .set({ ...productData, updatedAt: new Date() })
+        .set(updateData)
         .where(eq(products.id, id))
         .returning();
         
@@ -547,23 +557,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { page = 1, limit = 10, status = '' } = req.query;
       const offset = (parseInt(page as string) - 1) * parseInt(limit as string);
       
-      let query = db.select().from(orders);
+      let baseQuery = db.select().from(orders);
       
       if (status && status !== 'all') {
-        query = query.where(eq(orders.status, status as string));
+        baseQuery = baseQuery.where(eq(orders.status, status as string));
       }
       
-      const result = await query
+      const result = await baseQuery
         .orderBy(desc(orders.createdAt))
         .limit(parseInt(limit as string))
         .offset(offset);
       
       // Get total count
-      let countQuery = db.select({ count: count() }).from(orders);
+      let countBaseQuery = db.select({ count: count() }).from(orders);
       if (status && status !== 'all') {
-        countQuery = countQuery.where(eq(orders.status, status as string));
+        countBaseQuery = countBaseQuery.where(eq(orders.status, status as string));
       }
-      const [{ count: totalCount }] = await countQuery;
+      const [{ count: totalCount }] = await countBaseQuery;
       
       const totalPages = Math.ceil(totalCount / parseInt(limit as string));
 
