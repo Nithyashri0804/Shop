@@ -1,8 +1,10 @@
-const express = require('express');
-const { Pool } = require('pg');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const cors = require('cors');
+import express from 'express';
+import pg from 'pg';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import cors from 'cors';
+
+const { Pool } = pg;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -144,4 +146,4 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`AS Shreads API running on port ${PORT}`);
 });
 
-module.exports = app;
+export default app;
