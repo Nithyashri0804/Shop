@@ -56,20 +56,19 @@ The app is configured to serve static files through the Express server, which wo
 ```json
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api/[...slug].ts",
-      "use": "@vercel/node"
+  "functions": {
+    "api/index.js": {
+      "runtime": "@vercel/node@3.0.7"
     }
-  ],
+  },
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/api/[...slug].ts"
+      "dest": "/api/index.js"
     },
     {
       "src": "/(.*)",
-      "dest": "/api/[...slug].ts"
+      "dest": "/api/index.js"
     }
   ],
   "env": {
@@ -78,8 +77,14 @@ The app is configured to serve static files through the Express server, which wo
 }
 ```
 
-### api/[...slug].ts
-This file handles all requests and serves both API endpoints and static files.
+### api/index.js
+This file handles all requests and serves both API endpoints and static files. It's written in CommonJS format for better Vercel compatibility.
+
+## Fixed Issues
+✅ Converted from ES modules to CommonJS for Vercel compatibility
+✅ Simplified serverless function structure
+✅ Added proper error handling for production
+✅ Created basic health check and test endpoints
 
 ## Deployment Status
 ✅ Configuration files created

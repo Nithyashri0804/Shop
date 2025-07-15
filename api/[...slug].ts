@@ -1,16 +1,15 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import express from 'express';
-import { registerRoutes } from '../server/routes';
-import path from 'path';
-import fs from 'fs';
+import express, { type Request, Response, NextFunction } from "express";
+import { registerRoutes } from "../server/routes";
+import { serveStatic } from "../server/vite";
+import 'dotenv/config';
 
+// Create the Express app
 const app = express();
-
-// Configure Express middleware
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 
-// CORS middleware
+// CORS middleware for Vercel
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -23,38 +22,53 @@ app.use((req, res, next) => {
   }
 });
 
-// Serve static files manually for Vercel
-app.get('/', (req, res) => {
-  const indexPath = path.join(process.cwd(), 'client', 'index.html');
-  if (fs.existsSync(indexPath)) {
-    res.sendFile(indexPath);
-  } else {
-    res.send(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>AS Shreads</title>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1">
-        </head>
-        <body>
-          <div id="root">
-            <h1>AS Shreads - Loading...</h1>
-            <p>Your e-commerce store is starting up. Please wait...</p>
-          </div>
-        </body>
-      </html>
-    `);
-  }
+// Logging middleware
+app.use((req, res, next) => {
+  const start = Date.now();
+  const path = req.path;
+  let capturedJsonResponse: Record<string, any> | undefined = undefined;
+
+  const originalResJson = res.json;
+  res.json = function (bodyJson, ...args) {
+    capturedJsonResponse = bodyJson;
+    return originalResJson.apply(res, [bodyJson, ...args]);
+  };
+
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    if (path.startsWith("/api")) {
+      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
+      if (capturedJsonResponse) {
+        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+      }
+
+      if (logLine.length > 80) {
+        logLine = logLine.slice(0, 79) + "…";
+      }
+
+      console.log(logLine);
+    }
+  });
+
+  next();
 });
 
-// Initialize routes
-let initialized = false;
+// Error handling middleware
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  const status = err.status || err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
+  console.error('Error:', err);
+  res.status(status).json({ message });
+});
+
+// Initialize routes once
+let isInitialized = false;
 async function initializeApp() {
-  if (!initialized) {
+  if (!isInitialized) {
     try {
       await registerRoutes(app);
-      initialized = true;
+      serveStatic(app);
+      isInitialized = true;
     } catch (error) {
       console.error('Failed to initialize app:', error);
       throw error;
@@ -65,14 +79,15 @@ async function initializeApp() {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     await initializeApp();
-    
-    // Convert Vercel request to Express request
-    const expressReq = req as any;
-    const expressRes = res as any;
-    
-    // Handle the request with Express
-    return new Promise((resolve, reject) => {
-      expressRes.on('finish', resolve);
+    return app(req, res);
+  } catch (error) {
+    console.error('Serverless function error:', error);
+    return res.status(500).json({ 
+      message: 'Internal server error',
+      error: process.env.NODE_ENV === 'development' ? error : undefined
+    });
+  }
+}
       expressRes.on('error', reject);
       
       app(expressReq, expressRes);
