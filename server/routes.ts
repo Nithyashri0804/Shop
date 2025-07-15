@@ -80,6 +80,7 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  const httpServer = createServer(app);
   
   // Health check endpoint for monitoring
   app.get('/api/health', (req, res) => {
@@ -1113,6 +1114,5 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  const httpServer = createServer(app);
   return httpServer;
 }
