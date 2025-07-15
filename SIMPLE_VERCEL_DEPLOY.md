@@ -4,6 +4,7 @@
 ✅ **Clean API structure** - Simple Express.js serverless function
 ✅ **PostgreSQL integration** - Uses your production database
 ✅ **Core endpoints** - Auth, products, orders, categories
+✅ **Multi-language support** - English, Hindi, Spanish
 ✅ **No build complexity** - Direct JavaScript deployment
 
 ## Deploy Steps:
@@ -53,10 +54,19 @@ Your API will be available at:
 # Test health endpoint
 curl https://your-app.vercel.app/api/health
 
+# Test with different languages
+curl "https://your-app.vercel.app/api/health?lang=hi"
+curl "https://your-app.vercel.app/api/health?lang=es"
+
 # Test register
 curl -X POST https://your-app.vercel.app/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{"name":"Test User","email":"test@example.com","password":"testpass123"}'
 ```
+
+## Language Support:
+- **English**: `https://your-app.vercel.app?lang=en`
+- **Hindi**: `https://your-app.vercel.app?lang=hi`
+- **Spanish**: `https://your-app.vercel.app?lang=es`
 
 This setup is clean, simple, and will deploy without any build errors!

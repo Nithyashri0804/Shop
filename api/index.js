@@ -28,23 +28,91 @@ pool.query('SELECT NOW()', (err, res) => {
   }
 });
 
-// Health check endpoint
+// Health check endpoint with language support
 app.get('/api/health', (req, res) => {
+  const lang = req.query.lang || req.headers['accept-language']?.split(',')[0]?.split('-')[0] || 'en';
+  
+  const messages = {
+    en: 'AS Shreads API is running',
+    hi: 'AS Shreads API चल रहा है',
+    es: 'AS Shreads API está funcionando'
+  };
+  
   res.json({ 
     status: 'ok', 
     timestamp: new Date().toISOString(),
-    message: 'AS Shreads API is running',
-    database: pool.totalCount > 0 ? 'connected' : 'disconnected'
+    message: messages[lang] || messages.en,
+    language: lang,
+    database: pool.totalCount > 0 ? 'connected' : 'disconnected',
+    supportedLanguages: ['en', 'hi', 'es']
   });
 });
 
-// Root route
+// Language support
+const translations = {
+  en: {
+    title: "AS Shreads",
+    apiStatus: "API Status",
+    database: "Database",
+    environment: "Environment",
+    running: "Running Successfully",
+    connected: "Connected",
+    production: "Production",
+    endpoints: "Available API Endpoints",
+    healthCheck: "Health check",
+    userLogin: "User login",
+    userRegistration: "User registration",
+    getAllProducts: "Get all products",
+    createOrder: "Create new order",
+    getCategories: "Get categories",
+    backendReady: "Your e-commerce backend is ready for integration!"
+  },
+  hi: {
+    title: "AS Shreads",
+    apiStatus: "API स्थिति",
+    database: "डेटाबेस",
+    environment: "वातावरण",
+    running: "सफलतापूर्वक चल रहा है",
+    connected: "जुड़ा हुआ",
+    production: "उत्पादन",
+    endpoints: "उपलब्ध API एंडपॉइंट्स",
+    healthCheck: "स्वास्थ्य जांच",
+    userLogin: "उपयोगकर्ता लॉगिन",
+    userRegistration: "उपयोगकर्ता पंजीकरण",
+    getAllProducts: "सभी उत्पाद प्राप्त करें",
+    createOrder: "नया ऑर्डर बनाएं",
+    getCategories: "श्रेणियां प्राप्त करें",
+    backendReady: "आपका ई-कॉमर्स बैकएंड एकीकरण के लिए तैयार है!"
+  },
+  es: {
+    title: "AS Shreads",
+    apiStatus: "Estado de API",
+    database: "Base de datos",
+    environment: "Entorno",
+    running: "Funcionando correctamente",
+    connected: "Conectado",
+    production: "Producción",
+    endpoints: "Endpoints de API disponibles",
+    healthCheck: "Verificación de salud",
+    userLogin: "Inicio de sesión de usuario",
+    userRegistration: "Registro de usuario",
+    getAllProducts: "Obtener todos los productos",
+    createOrder: "Crear nueva orden",
+    getCategories: "Obtener categorías",
+    backendReady: "¡Su backend de comercio electrónico está listo para la integración!"
+  }
+};
+
+// Root route with language support
 app.get('/', (req, res) => {
+  const lang = req.query.lang || req.headers['accept-language']?.split(',')[0]?.split('-')[0] || 'en';
+  const t = translations[lang] || translations.en;
+  
   res.send(`
     <!DOCTYPE html>
-    <html>
+    <html lang="${lang}">
       <head>
-        <title>AS Shreads</title>
+        <title>${t.title}</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
@@ -54,29 +122,36 @@ app.get('/', (req, res) => {
           .status { background: #e8f5e8; padding: 20px; border-radius: 4px; margin: 20px 0; }
           .api-info { background: #f0f8ff; padding: 20px; border-radius: 4px; margin: 20px 0; }
           ul { line-height: 1.6; }
+          .lang-switcher { text-align: center; margin: 20px 0; }
+          .lang-switcher a { margin: 0 10px; text-decoration: none; color: #007bff; }
         </style>
       </head>
       <body>
         <div class="container">
-          <h1>🛍️ AS Shreads</h1>
+          <div class="lang-switcher">
+            <a href="?lang=en">English</a> |
+            <a href="?lang=hi">हिंदी</a> |
+            <a href="?lang=es">Español</a>
+          </div>
+          <h1>🛍️ ${t.title}</h1>
           <div class="status">
-            <strong>✅ API Status:</strong> Running Successfully<br>
-            <strong>🗄️ Database:</strong> Connected<br>
-            <strong>⚡ Environment:</strong> Production
+            <strong>✅ ${t.apiStatus}:</strong> ${t.running}<br>
+            <strong>🗄️ ${t.database}:</strong> ${t.connected}<br>
+            <strong>⚡ ${t.environment}:</strong> ${t.production}
           </div>
           <div class="api-info">
-            <h3>Available API Endpoints:</h3>
+            <h3>${t.endpoints}:</h3>
             <ul>
-              <li><strong>GET /api/health</strong> - Health check</li>
-              <li><strong>POST /api/auth/login</strong> - User login</li>
-              <li><strong>POST /api/auth/register</strong> - User registration</li>
-              <li><strong>GET /api/products</strong> - Get all products</li>
-              <li><strong>POST /api/orders</strong> - Create new order</li>
-              <li><strong>GET /api/categories</strong> - Get categories</li>
+              <li><strong>GET /api/health</strong> - ${t.healthCheck}</li>
+              <li><strong>POST /api/auth/login</strong> - ${t.userLogin}</li>
+              <li><strong>POST /api/auth/register</strong> - ${t.userRegistration}</li>
+              <li><strong>GET /api/products</strong> - ${t.getAllProducts}</li>
+              <li><strong>POST /api/orders</strong> - ${t.createOrder}</li>
+              <li><strong>GET /api/categories</strong> - ${t.getCategories}</li>
             </ul>
           </div>
           <p style="text-align: center; color: #666; margin-top: 40px;">
-            Your e-commerce backend is ready for integration!
+            ${t.backendReady}
           </p>
         </div>
       </body>
