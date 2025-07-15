@@ -6,6 +6,14 @@ This is a full-stack e-commerce application built with React and Express, featur
 
 ## Recent Changes
 
+### Vercel Deployment Configuration (July 15, 2025)
+- ✓ Created vercel.json configuration for serverless deployment
+- ✓ Updated api/[...slug].ts to handle Vercel serverless functions
+- ✓ Created comprehensive Vercel deployment guide
+- ✓ Fixed build process for Vercel compatibility
+- ✓ Added @vercel/node dependency
+- ✓ Configured environment variables for production deployment
+
 ### Project Migration and Deployment Setup (July 15, 2025)
 - ✓ Successfully migrated from Replit Agent to Replit environment
 - ✓ Installed missing dependencies (cross-env)
