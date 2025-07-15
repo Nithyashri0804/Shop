@@ -71,6 +71,8 @@ Preferred communication style: Simple, everyday language.
 - ✓ Added comprehensive deployment guides for both Render and Vercel platforms
 - ✓ Configured multi-language support (English, Hindi, Spanish) for better user experience
 - ✓ Updated Vercel configuration for ES6 module deployment
+- ✓ Successfully deployed AS Shreads API to Render (primary deployment)
+- ✓ Vercel deployment limited due to free tier usage restrictions
 
 ## System Architecture
 
