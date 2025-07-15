@@ -40,33 +40,21 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Root route
-app.get('/', (req, res) => {
-  res.send(`
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <title>AS Shreads API</title>
-        <style>
-          body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
-          .container { max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 8px; }
-          h1 { color: #333; text-align: center; }
-          .status { background: #e8f5e8; padding: 20px; border-radius: 4px; margin: 20px 0; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <h1>🛍️ AS Shreads API</h1>
-          <div class="status">
-            <strong>✅ Status:</strong> Running Successfully<br>
-            <strong>🗄️ Database:</strong> Connected<br>
-            <strong>📡 Port:</strong> ${PORT}
-          </div>
-          <p>Your e-commerce API is ready!</p>
-        </div>
-      </body>
-    </html>
-  `);
+// API routes only - frontend will be served by Vercel's static build
+app.get('/api/', (req, res) => {
+  res.json({
+    message: 'AS Shreads API',
+    status: 'running',
+    database: 'connected',
+    port: PORT,
+    endpoints: [
+      'GET /api/health',
+      'POST /api/auth/login',
+      'POST /api/auth/register',
+      'GET /api/products',
+      'POST /api/orders'
+    ]
+  });
 });
 
 // Auth endpoints
