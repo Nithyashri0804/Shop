@@ -1,0 +1,62 @@
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+import express from 'express';
+import { registerRoutes } from '../server/routes';
+import { serveStatic } from '../server/vite';
+
+const app = express();
+
+// Configure Express middleware
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: false, limit: '50mb' }));
+
+// CORS middleware for API routes
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+  } else {
+    next();
+  }
+});
+
+// Initialize routes
+let initialized = false;
+async function initializeApp() {
+  if (!initialized) {
+    try {
+      await registerRoutes(app);
+      serveStatic(app);
+      initialized = true;
+    } catch (error) {
+      console.error('Failed to initialize app:', error);
+      throw error;
+    }
+  }
+}
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  try {
+    await initializeApp();
+    
+    // Convert Vercel request to Express request
+    const expressReq = req as any;
+    const expressRes = res as any;
+    
+    // Handle the request with Express
+    return new Promise((resolve, reject) => {
+      expressRes.on('finish', resolve);
+      expressRes.on('error', reject);
+      
+      app(expressReq, expressRes);
+    });
+  } catch (error) {
+    console.error('Handler error:', error);
+    return res.status(500).json({ 
+      error: 'Internal Server Error',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+}
