@@ -3,7 +3,7 @@ services:
     name: as-shreads-backend
     env: node
     plan: free
-    buildCommand: npm install && npm run build
+    buildCommand: npm install && npm install --only=dev && npm run build
     startCommand: npm start
     healthCheckPath: /api/health
     envVars:
