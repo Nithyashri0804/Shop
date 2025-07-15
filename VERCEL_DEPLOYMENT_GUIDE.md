@@ -28,9 +28,14 @@ The project is already configured with:
 
 ### Option B: Using Vercel Dashboard
 1. Connect your GitHub repository
-2. Set the build command to: `npm run build`
-3. Set the output directory to: `dist/public`
+2. The build will use the configuration from vercel.json
+3. No need to set build command or output directory
 4. Deploy
+
+## Current Build Status
+✅ Dependencies installed successfully
+✅ No critical errors in build process
+⚠️ Warning about builds configuration is expected (using functions instead)
 
 ## Step 4: Database Setup
 After deployment, run the database migration:
